@@ -381,7 +381,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void reDrawLine() {
     
 	    mMap.clear();
-	    mPolylineOptions.color(COLOR_ARGB_BLUE).width(POLYLINE_STROKE_WIDTH_PX).visible(true);
+	    mPolylineOptions.color(COLOR_BLUE).width(POLYLINE_STROKE_WIDTH_PX).visible(true);
 	    for(int i=0; i < mPoints.size(); i++)
 		    mPolylineOptions.add(mPoints.get(i));
 	    mMap.addPolyline(mPolylineOptions);
