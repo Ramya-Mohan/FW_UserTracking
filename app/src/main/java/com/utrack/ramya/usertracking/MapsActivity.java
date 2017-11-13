@@ -39,8 +39,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -75,6 +78,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
     private long FASTEST_INTERVAL = 2000; /* 2 sec */
     private MyLocationCallback mLocationCallback;
+
+    private static final int COLOR_BLUE = Color.BLUE; //0x005a47d2; purple color
+    private static final int POLYLINE_STROKE_WIDTH_PX = 12;
+    
+    private PolylineOptions mPolylineOptions;
+    private ArrayList<LatLng> mPoints;
+    OA
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +121,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Check whether location settings are satisfied
         mSettingsClient = LocationServices.getSettingsClient(this);
+
+	mPolylineOptions = new PolylineOptions();
+
+	mPoints = new ArrrayList<LatLng>();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -346,8 +360,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (location != null) {
             if (location != mLastKnownLocation) {
                 mLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-                mMap.addMarker(new MarkerOptions().position(mLatLng).title(" Updated Location"));
+		mPoints.add(mLatLng);
+		/*
+		 * Draw polyline if the user moves than 3 yards = 10 feet.
+		 * float distance = mLastKnownLocation.distanceTo(location);
+		 */
+		if(mLastKnownLocation != null)
+			reDrawLine();
+		else 
+	                mMap.addMarker(new MarkerOptions().position(mLatLng).title(" MyLocation"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                         mLatLng, DEFAULT_ZOOM));
                 mLastKnownLocation = location;
@@ -357,6 +378,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    private void reDrawLine() {
+    
+	    mMap.clear();
+	    mPolylineOptions.color(COLOR_ARGB_BLUE).width(POLYLINE_STROKE_WIDTH_PX).visible(true);
+	    for(int i=0; i < mPoints.size(); i++)
+		    mPolylineOptions.add(mPoints.get(i));
+	    mMap.addPolyline(mPolylineOptions);
+    }
     /**
      * To get activity result of location services.
      *
